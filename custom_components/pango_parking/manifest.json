@@ -1,0 +1,11 @@
+{
+  "domain": "pango_parking",
+  "name": "Pango Parking",
+  "version": "0.2.0",
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "loggers": [
+    "custom_components.pango_parking"
+  ]
+}

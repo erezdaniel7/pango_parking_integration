@@ -1,0 +1,52 @@
+{
+  "title": "Pango Parking",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Pango Parking",
+        "description": "Enter your Pango credentials and polling interval.",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "poll_interval_minutes": "Polling interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "cannot_connect": "Failed to connect to Pango",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Account is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Pango Parking options",
+        "data": {
+          "poll_interval_minutes": "Polling interval (minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "is_parking_active": {
+        "name": "Is parking active"
+      },
+      "parking_start_time": {
+        "name": "Parking start time"
+      },
+      "parking_end_time": {
+        "name": "Parking end time"
+      }
+    },
+    "button": {
+      "poll_now": {
+        "name": "Poll now"
+      }
+    }
+  }
+}
