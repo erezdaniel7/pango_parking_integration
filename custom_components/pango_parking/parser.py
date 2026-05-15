@@ -19,6 +19,11 @@ LABEL_ROW_RE_TEMPLATE = (
     r"<td[^>]*>\s*{label}\s*</td>\s*<td[^>]*>(.*?)</td>"
 )
 TIME_RE = re.compile(r"^\d{2}:\d{2}:\d{2}$")
+CAR_ID_RE = re.compile(
+    r'<select[^>]*id="ctl00_ContentPlaceHolder1_cboCars"[^>]*>.*?'
+    r'<option[^>]*selected[^>]*>([^<]+)</option>',
+    re.IGNORECASE | re.DOTALL
+)
 
 
 def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
@@ -29,6 +34,7 @@ def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
     start_raw = _extract_start_time(page_html)
     end_raw = _extract_end_time(page_html)
     target_raw = _extract_target_date(page_html)
+    car_id = _extract_car_id(page_html)
 
     tz = _resolve_timezone(timezone_name)
     target_dt = _parse_target_datetime(target_raw, tz)
@@ -46,7 +52,16 @@ def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
         "start_time_raw": start_raw,
         "end_time_raw": end_raw,
         "target_date_raw": target_raw,
+        "car_id": car_id,
     }
+
+
+def _extract_car_id(page_html: str) -> str | None:
+    """Extract selected car ID from combobox."""
+    match = CAR_ID_RE.search(page_html)
+    if not match:
+        return None
+    return match.group(1).strip() or None
 
 
 def _extract_target_date(page_html: str) -> str | None:

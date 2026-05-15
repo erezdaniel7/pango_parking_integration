@@ -9,6 +9,7 @@ from typing import Callable
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -84,7 +85,28 @@ class PangoParkingSensor(CoordinatorEntity[PangoParkingDataUpdateCoordinator], S
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
-        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._entry = entry
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique ID with car_id."""
+        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
+        if car_id:
+            return f"{self._entry.entry_id}_{car_id}_{self.entity_description.key}"
+        return f"{self._entry.entry_id}_{self.entity_description.key}"
+
+    @property
+    def device_info(self) -> DeviceInfo | None:
+        """Return device info."""
+        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
+        if not car_id:
+            return None
+
+        return DeviceInfo(
+            identifiers={(DOMAIN, car_id)},
+            name=f"Car {car_id}",
+            manufacturer="Pango",
+        )
 
     @property
     def native_value(self) -> bool | datetime | None:

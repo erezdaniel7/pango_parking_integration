@@ -79,6 +79,14 @@ INACTIVE_LIVE_SHAPE_HTML = """
 </tr>
 """
 
+CAR_ID_HTML = """
+<select name="ctl00$ContentPlaceHolder1$cboCars" onchange="javascript:setTimeout('__doPostBack(\\'ctl00$ContentPlaceHolder1$cboCars\\',\\'\\')', 0)" id="ctl00_ContentPlaceHolder1_cboCars">
+<option>000-00-000</option>
+<option selected="selected">485-03-704</option>
+<option>999-99-999</option>
+</select>
+"""
+
 
 def test_parse_active_parking() -> None:
     """Active parking page should set active with parsed times."""
@@ -120,3 +128,10 @@ def test_parse_inactive_live_shape() -> None:
     assert result["is_inactive"] is True
     assert result["start_time_raw"] is None
     assert result["end_time_raw"] is None
+
+
+def test_extract_car_id() -> None:
+    """Car ID should be extracted from combobox."""
+    result = parse_parking_page(CAR_ID_HTML, "Asia/Jerusalem")
+
+    assert result["car_id"] == "485-03-704"
