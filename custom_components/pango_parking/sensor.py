@@ -109,6 +109,11 @@ class PangoParkingSensor(CoordinatorEntity[PangoParkingDataUpdateCoordinator], S
         )
 
     @property
+    def available(self) -> bool:
+        """Stay available on errors as long as we have previously fetched data."""
+        return self.coordinator.data is not None
+
+    @property
     def native_value(self) -> bool | datetime | None:
         data = self.coordinator.data or {}
         return self.entity_description.value_fn(data)

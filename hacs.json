@@ -1,7 +1,12 @@
 {
-  "name": "Pango Parking",
-  "render_readme": true,
-  "homeassistant": "2025.1.0",
-  "country": ["IL"],
-  "domains": ["sensor", "button"]
+    "name": "Pango Parking",
+    "render_readme": true,
+    "homeassistant": "2025.1.0",
+    "country": [
+        "IL"
+    ],
+    "domains": [
+        "sensor",
+        "button"
+    ]
 }

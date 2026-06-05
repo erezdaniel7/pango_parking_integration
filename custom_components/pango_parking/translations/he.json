@@ -1,52 +1,52 @@
 {
-  "title": "חניית Pango",
-  "config": {
-    "step": {
-      "user": {
-        "title": "הגדרת חניית Pango",
-        "description": "הזן שם משתמש, סיסמה ומרווח רענון.",
-        "data": {
-          "username": "שם משתמש",
-          "password": "סיסמה",
-          "poll_interval_minutes": "מרווח רענון (בדקות)"
+    "title": "חניית Pango",
+    "config": {
+        "step": {
+            "user": {
+                "title": "הגדרת חניית Pango",
+                "description": "הזן שם משתמש, סיסמה ומרווח רענון.",
+                "data": {
+                    "username": "שם משתמש",
+                    "password": "סיסמה",
+                    "poll_interval_minutes": "מרווח רענון (בדקות)"
+                }
+            }
+        },
+        "error": {
+            "invalid_auth": "שם משתמש או סיסמה שגויים",
+            "cannot_connect": "נכשל החיבור ל-Pango",
+            "unknown": "שגיאה לא צפויה"
+        },
+        "abort": {
+            "already_configured": "החשבון כבר מוגדר"
         }
-      }
     },
-    "error": {
-      "invalid_auth": "שם משתמש או סיסמה שגויים",
-      "cannot_connect": "נכשל החיבור ל-Pango",
-      "unknown": "שגיאה לא צפויה"
-    },
-    "abort": {
-      "already_configured": "החשבון כבר מוגדר"
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "אפשרויות חניית Pango",
-        "data": {
-          "poll_interval_minutes": "מרווח רענון (בדקות)"
+    "options": {
+        "step": {
+            "init": {
+                "title": "אפשרויות חניית Pango",
+                "data": {
+                    "poll_interval_minutes": "מרווח רענון (בדקות)"
+                }
+            }
         }
-      }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "is_parking_active": {
-        "name": "האם חניה פעילה"
-      },
-      "parking_start_time": {
-        "name": "זמן תחילת חניה"
-      },
-      "parking_end_time": {
-        "name": "זמן סיום חניה"
-      }
     },
-    "button": {
-      "poll_now": {
-        "name": "רענון עכשיו"
-      }
+    "entity": {
+        "sensor": {
+            "is_parking_active": {
+                "name": "האם חניה פעילה"
+            },
+            "parking_start_time": {
+                "name": "זמן תחילת חניה"
+            },
+            "parking_end_time": {
+                "name": "זמן סיום חניה"
+            }
+        },
+        "button": {
+            "poll_now": {
+                "name": "רענון עכשיו"
+            }
+        }
     }
-  }
 }
