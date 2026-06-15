@@ -1,18 +1,11 @@
 {
-    "codeowners": [
-        "@erezdaniel7"
-    ],
-    "config_flow": true,
-    "documentation": "https://github.com/erezdaniel7/pango_parking_integration",
     "domain": "pango_parking",
-    "homeassistant": "2024.6.0",
-    "icon": "mdi:parking",
+    "name": "Pango Parking",
+    "version": "0.3.0",
+    "config_flow": true,
     "iot_class": "cloud_polling",
-    "issue_tracker": "https://github.com/erezdaniel7/pango_parking_integration/issues",
+    "requirements": [],
     "loggers": [
         "custom_components.pango_parking"
-    ],
-    "name": "Pango Parking",
-    "requirements": [],
-    "version": "0.3.0"
+    ]
 }

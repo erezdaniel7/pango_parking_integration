@@ -1,13 +1,11 @@
 {
+    "name": "Pango Parking",
+    "render_readme": true,
     "country": [
         "IL"
     ],
     "domains": [
         "sensor",
         "button"
-    ],
-    "hide_default_branch": true,
-    "name": "Pango Parking",
-    "render_readme": true,
-    "zip_release": true
+    ]
 }
