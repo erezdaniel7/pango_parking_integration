@@ -1,14 +1,13 @@
 {
-    "name": "Pango Parking",
-    "render_readme": true,
-    "zip_release": true,
-    "hide_default_branch": true,
-    "homeassistant": "2025.1.0",
     "country": [
         "IL"
     ],
     "domains": [
         "sensor",
         "button"
-    ]
+    ],
+    "hide_default_branch": true,
+    "name": "Pango Parking",
+    "render_readme": true,
+    "zip_release": true
 }
