@@ -1,5 +1,9 @@
 # Pango Parking
 
+<p align="center">
+   <img src="assets/logo.svg" alt="Pango Parking logo" width="140" />
+</p>
+
 Home Assistant custom integration for reading active parking status from Pango.
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
@@ -15,6 +19,7 @@ This integration logs in to Pango, reads parking status from the driver portal, 
 - Configurable polling interval in minutes (default 10)
 - Poll now button for manual refresh
 - Automatic re-login when the session expires
+- Automation blueprint for parking notifications
 
 ### Entities
 
@@ -22,6 +27,33 @@ This integration logs in to Pango, reads parking status from the driver portal, 
 - Sensor: Parking start time
 - Sensor: Parking end time
 - Button: Poll now
+
+## Blueprint: Parking Notifications
+
+This repository includes a Home Assistant automation blueprint for notifications when:
+
+- Parking starts
+- Parking ends
+- Parking is still active each hour (top of hour)
+
+Blueprint file:
+
+- blueprints/automation/pango_parking/parking_notifications.yaml
+
+Direct import URL:
+
+- https://raw.githubusercontent.com/erezdaniel7/pango_parking_integration/main/blueprints/automation/pango_parking/parking_notifications.yaml
+
+After importing, select:
+
+- Is parking active sensor
+- Parking start time sensor
+- Parking end time sensor
+- Action for parking started
+- Action for parking ended
+- Action for hourly reminder while active
+
+Tip: In action templates, you can use variables: `parking_active`, `parking_start`, and `parking_end`.
 
 ## Installation
 
@@ -69,6 +101,16 @@ This integration logs in to Pango, reads parking status from the driver portal, 
 - Active parking: exposes active state plus start/end parking times.
 - Inactive parking: exposes inactive state with no start/end values.
 - Pango start/stop actions may require CAPTCHA in the website flow. This integration does not perform those actions.
+
+## Releases and Version Display in HA
+
+To make Home Assistant/HACS show release versions (for example `0.3.0`) instead of commit IDs:
+
+1. Bump `version` in `custom_components/pango_parking/manifest.json`.
+2. Create a matching Git tag, for example `v0.3.0`.
+3. Publish a GitHub Release from that tag.
+
+This repository is configured with `zip_release: true` and `hide_default_branch: true` in `hacs.json` so HACS tracks releases rather than default-branch commits.
 
 ## Troubleshooting
 

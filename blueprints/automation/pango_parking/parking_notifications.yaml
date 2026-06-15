@@ -1,0 +1,117 @@
+blueprint:
+  name: Pango Parking Notifications
+  description: |
+    Send notifications when parking starts, when parking ends,
+    and once every hour while parking is still active.
+
+    Use the action selectors to define how each notification should be sent
+    (for example: mobile app push, Telegram, or any notify service).
+
+    Variables available in your action templates:
+    - parking_active: current value of the active parking sensor
+    - parking_start: current value of the parking start time sensor
+    - parking_end: current value of the parking end time sensor
+  domain: automation
+  source_url: https://github.com/erezdaniel7/pango_parking_integration/blob/main/blueprints/automation/pango_parking/parking_notifications.yaml
+  homeassistant:
+    min_version: 2024.6.0
+
+input:
+  parking_active_sensor:
+    name: Parking active sensor
+    description: Select the Pango "Is parking active" sensor.
+    selector:
+      entity:
+        domain: sensor
+
+  parking_start_sensor:
+    name: Parking start time sensor
+    description: Select the Pango "Parking start time" sensor.
+    selector:
+      entity:
+        domain: sensor
+
+  parking_end_sensor:
+    name: Parking end time sensor
+    description: Select the Pango "Parking end time" sensor.
+    selector:
+      entity:
+        domain: sensor
+
+  parking_started_action:
+    name: Action when parking starts
+    description: Action sequence to run when parking becomes active.
+    selector:
+      action: {}
+
+  parking_ended_action:
+    name: Action when parking ends
+    description: Action sequence to run when parking becomes inactive.
+    selector:
+      action: {}
+
+  parking_hourly_action:
+    name: Action each hour while active
+    description: Action sequence to run at the top of every hour while parking is active.
+    selector:
+      action: {}
+
+variables:
+  parking_active_sensor: !input parking_active_sensor
+  parking_start_sensor: !input parking_start_sensor
+  parking_end_sensor: !input parking_end_sensor
+  parking_active: "{{ states(parking_active_sensor) }}"
+  parking_start: "{{ states(parking_start_sensor) }}"
+  parking_end: "{{ states(parking_end_sensor) }}"
+
+trigger:
+  - platform: state
+    entity_id: !input parking_active_sensor
+    id: parking_started
+
+  - platform: state
+    entity_id: !input parking_active_sensor
+    id: parking_ended
+
+  - platform: time_pattern
+    minutes: "0"
+    id: hourly_tick
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >
+              {{
+                trigger.id == 'parking_started'
+                and trigger.from_state is not none
+                and trigger.to_state is not none
+                and trigger.from_state.state | lower in ['false', 'off', 'unknown', 'unavailable', 'none']
+                and trigger.to_state.state | lower in ['true', 'on']
+              }}
+        sequence: !input parking_started_action
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{
+                trigger.id == 'parking_ended'
+                and trigger.from_state is not none
+                and trigger.to_state is not none
+                and trigger.from_state.state | lower in ['true', 'on']
+                and trigger.to_state.state | lower in ['false', 'off', 'unknown', 'unavailable', 'none']
+              }}
+        sequence: !input parking_ended_action
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{
+                trigger.id == 'hourly_tick'
+                and states(parking_active_sensor) | lower in ['true', 'on']
+              }}
+        sequence: !input parking_hourly_action
+
+mode: single
