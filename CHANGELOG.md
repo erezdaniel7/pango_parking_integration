@@ -2,7 +2,11 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
-## [0.4.1] - 2026-06-19
+## [0.4.2] - 2026-06-19
+
+### Fixed
+- **Duplicate entity**: `sensor.is_parking_active` from v0.3.0 was left as a stale orphan after migration to `binary_sensor`. Added automatic cleanup in `async_setup_entry` to remove it on next HA restart.
+
 
 ### Fixed
 - **HACS install error**: Removed `zip_release: true` from `hacs.json` — HACS was looking for a `.zip` asset in the release and failing with `NoneType` error because no zip was provided
