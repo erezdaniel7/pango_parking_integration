@@ -2,7 +2,30 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
-## [0.3.0] - 2026-06-15
+## [0.4.0] - 2026-06-19
+
+### Fixed
+- **HACS ecosystem compliance**: 7 blocking issues that caused hassfest/HACS validation to fail
+- **Logo now visible in HA**: Moved icon to `brand/` subdirectory (HA 2026.3+ requirement); compressed from 143 KB → 4.2 KB (256×256); added `icon@2x.png` (512×512) for Retina displays
+- **Auth re-prompt**: Coordinator now raises `ConfigEntryAuthFailed` on persistent login failure, triggering HA's built-in re-authentication UI instead of silently failing
+- **Entity availability**: Sensors no longer show as "available" when the coordinator is in an error state
+- **`is_parking_active` entity type**: Moved from `SensorEntity` to `BinarySensorEntity` (correct type for on/off state)
+- **Blueprint**: Updated trigger to use `to: "on"` / `from: "on"` (proper binary sensor states); updated sensor selector to `domain: binary_sensor`
+- **Blueprint import**: Added one-click import badge to README
+
+### Added
+- **GitHub Actions CI**: `validate.yml` (hassfest + HACS validation, runs daily), `lint.yml` (Ruff), `release.yml` (auto GitHub Release on tag push)
+- **`binary_sensor.py`**: New platform for the parking active binary sensor
+- **`entity.py`**: Base entity class (`PangoBaseEntity`) eliminating code duplication
+- **`data.py`**: Typed `PangoConfigEntry` alias and `PangoRuntimeData` dataclass
+
+### Changed
+- Migrated from deprecated `hass.data[DOMAIN]` to `entry.runtime_data` pattern
+- `manifest.json`: Added `codeowners`, `documentation`, `issue_tracker`
+- `hacs.json`: Added `zip_release: true`, `hide_default_branch: true`, `homeassistant: 2024.6.0`
+- `config_flow.py`: Removed deprecated `OptionsFlow.__init__`; exceptions now logged; added return type annotations
+- `const.py`: Removed `SensorDeviceClass` import and `DATA_COORDINATOR` constant
+
 
 ### Added
 - **Automation Blueprint**: New blueprint for parking notifications with three trigger types:
