@@ -2,119 +2,83 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
-
-from .const import (
-    DATA_COORDINATOR,
-    DOMAIN,
-    SENSOR_DEVICE_CLASSES,
-    SENSOR_KEY_ACTIVE,
-    SENSOR_KEY_END,
-    SENSOR_KEY_START,
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from .const import SENSOR_KEY_END, SENSOR_KEY_START
 from .coordinator import PangoParkingDataUpdateCoordinator
+from .data import PangoConfigEntry
+from .entity import PangoBaseEntity
 
 
 @dataclass(frozen=True, kw_only=True)
 class PangoSensorEntityDescription(SensorEntityDescription):
     """Pango sensor entity description."""
 
-    value_fn: Callable[[dict], bool | datetime | None]
+    value_fn: Callable[[dict], datetime | None]
 
 
 SENSOR_DESCRIPTIONS: tuple[PangoSensorEntityDescription, ...] = (
-    PangoSensorEntityDescription(
-        key=SENSOR_KEY_ACTIVE,
-        translation_key=SENSOR_KEY_ACTIVE,
-        icon="mdi:car",
-        value_fn=lambda data: data.get("is_active"),
-        device_class=SENSOR_DEVICE_CLASSES[SENSOR_KEY_ACTIVE],
-    ),
     PangoSensorEntityDescription(
         key=SENSOR_KEY_START,
         translation_key=SENSOR_KEY_START,
         icon="mdi:clock-start",
         value_fn=lambda data: data.get("start_time"),
-        device_class=SENSOR_DEVICE_CLASSES[SENSOR_KEY_START],
+        device_class=SensorDeviceClass.TIMESTAMP,
     ),
     PangoSensorEntityDescription(
         key=SENSOR_KEY_END,
         translation_key=SENSOR_KEY_END,
         icon="mdi:clock-end",
         value_fn=lambda data: data.get("end_time"),
-        device_class=SENSOR_DEVICE_CLASSES[SENSOR_KEY_END],
+        device_class=SensorDeviceClass.TIMESTAMP,
     ),
 )
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: PangoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    data = hass.data[DOMAIN][entry.entry_id]
-    coordinator: PangoParkingDataUpdateCoordinator = data[DATA_COORDINATOR]
-
-    entities = [
-        PangoParkingSensor(coordinator, entry, description)
+    """Set up Pango Parking sensors from a config entry."""
+    coordinator = entry.runtime_data.coordinator
+    async_add_entities(
+        PangoParkingSensor(coordinator, description)
         for description in SENSOR_DESCRIPTIONS
-    ]
-    async_add_entities(entities)
+    )
 
 
-class PangoParkingSensor(CoordinatorEntity[PangoParkingDataUpdateCoordinator], SensorEntity):
+class PangoParkingSensor(PangoBaseEntity, SensorEntity):
     """Representation of a Pango Parking sensor."""
 
     entity_description: PangoSensorEntityDescription
-    _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: PangoParkingDataUpdateCoordinator,
-        entry: ConfigEntry,
         description: PangoSensorEntityDescription,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
-        self._entry = entry
-
-    @property
-    def unique_id(self) -> str:
-        """Return unique ID with car_id."""
-        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
-        if car_id:
-            return f"{self._entry.entry_id}_{car_id}_{self.entity_description.key}"
-        return f"{self._entry.entry_id}_{self.entity_description.key}"
-
-    @property
-    def device_info(self) -> DeviceInfo | None:
-        """Return device info."""
-        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
-        if not car_id:
-            return None
-
-        return DeviceInfo(
-            identifiers={(DOMAIN, car_id)},
-            name=f"Car {car_id}",
-            manufacturer="Pango",
-        )
+        self._unique_id_suffix = description.key
 
     @property
     def available(self) -> bool:
-        """Stay available on errors as long as we have previously fetched data."""
-        return self.coordinator.data is not None
+        """Return availability — requires both coordinator success and data present."""
+        return super().available and self.coordinator.data is not None
 
     @property
-    def native_value(self) -> bool | datetime | None:
+    def native_value(self) -> datetime | None:
         data = self.coordinator.data or {}
         return self.entity_description.value_fn(data)
 
@@ -129,3 +93,4 @@ class PangoParkingSensor(CoordinatorEntity[PangoParkingDataUpdateCoordinator], S
                 "target_date_raw": data.get("target_date_raw"),
             }
         return {}
+

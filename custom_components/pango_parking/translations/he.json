@@ -32,10 +32,12 @@
         }
     },
     "entity": {
-        "sensor": {
+        "binary_sensor": {
             "is_parking_active": {
                 "name": "האם חניה פעילה"
-            },
+            }
+        },
+        "sensor": {
             "parking_start_time": {
                 "name": "זמן תחילת חניה"
             },

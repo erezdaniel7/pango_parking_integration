@@ -8,7 +8,7 @@ blueprint:
     (for example: mobile app push, Telegram, or any notify service).
 
     Variables available in your action templates:
-    - parking_active: current value of the active parking sensor
+    - parking_active: current state of the active parking binary sensor (on/off)
     - parking_start: current value of the parking start time sensor
     - parking_end: current value of the parking end time sensor
   domain: automation
@@ -19,10 +19,10 @@ blueprint:
 input:
   parking_active_sensor:
     name: Parking active sensor
-    description: Select the Pango "Is parking active" sensor.
+    description: Select the Pango "Is parking active" binary sensor.
     selector:
       entity:
-        domain: sensor
+        domain: binary_sensor
 
   parking_start_sensor:
     name: Parking start time sensor
@@ -67,10 +67,12 @@ variables:
 trigger:
   - platform: state
     entity_id: !input parking_active_sensor
+    to: "on"
     id: parking_started
 
   - platform: state
     entity_id: !input parking_active_sensor
+    from: "on"
     id: parking_ended
 
   - platform: time_pattern
@@ -82,36 +84,21 @@ condition: []
 action:
   - choose:
       - conditions:
-          - condition: template
-            value_template: >
-              {{
-                trigger.id == 'parking_started'
-                and trigger.from_state is not none
-                and trigger.to_state is not none
-                and trigger.from_state.state | lower in ['false', 'off', 'unknown', 'unavailable', 'none']
-                and trigger.to_state.state | lower in ['true', 'on']
-              }}
+          - condition: trigger
+            id: parking_started
         sequence: !input parking_started_action
 
       - conditions:
-          - condition: template
-            value_template: >
-              {{
-                trigger.id == 'parking_ended'
-                and trigger.from_state is not none
-                and trigger.to_state is not none
-                and trigger.from_state.state | lower in ['true', 'on']
-                and trigger.to_state.state | lower in ['false', 'off', 'unknown', 'unavailable', 'none']
-              }}
+          - condition: trigger
+            id: parking_ended
         sequence: !input parking_ended_action
 
       - conditions:
-          - condition: template
-            value_template: >
-              {{
-                trigger.id == 'hourly_tick'
-                and states(parking_active_sensor) | lower in ['true', 'on']
-              }}
+          - condition: trigger
+            id: hourly_tick
+          - condition: state
+            entity_id: !input parking_active_sensor
+            state: "on"
         sequence: !input parking_hourly_action
 
 mode: single
