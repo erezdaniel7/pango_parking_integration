@@ -2,7 +2,12 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
-## [0.4.0] - 2026-06-19
+## [0.4.1] - 2026-06-19
+
+### Fixed
+- **HACS install error**: Removed `zip_release: true` from `hacs.json` — HACS was looking for a `.zip` asset in the release and failing with `NoneType` error because no zip was provided
+- **Logo not appearing in HA**: Re-saved `brand/icon.png` as proper RGBA PNG (was incorrectly saved as palette mode P after quantization)
+
 
 ### Fixed
 - **HACS ecosystem compliance**: 7 blocking issues that caused hassfest/HACS validation to fail

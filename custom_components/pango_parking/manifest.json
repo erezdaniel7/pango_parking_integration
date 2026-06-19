@@ -1,7 +1,7 @@
 {
     "domain": "pango_parking",
     "name": "Pango Parking",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "codeowners": ["@erezdaniel7"],
     "config_flow": true,
     "documentation": "https://github.com/erezdaniel7/pango_parking_integration",
