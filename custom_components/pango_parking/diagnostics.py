@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.diagnostics import async_redact_data
 
-from .const import DATA_COORDINATOR, DOMAIN
+from .data import PangoConfigEntry
 
 TO_REDACT = {
     CONF_USERNAME,
@@ -21,10 +20,10 @@ TO_REDACT = {
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: PangoConfigEntry,
 ) -> dict:
     """Return diagnostics for a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
+    coordinator = entry.runtime_data.coordinator
 
     diagnostics = {
         "entry": {
@@ -41,3 +40,4 @@ async def async_get_config_entry_diagnostics(
     }
 
     return async_redact_data(diagnostics, TO_REDACT)
+

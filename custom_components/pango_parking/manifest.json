@@ -2,7 +2,10 @@
     "domain": "pango_parking",
     "name": "Pango Parking",
     "version": "0.3.0",
+    "codeowners": ["@erezdaniel7"],
     "config_flow": true,
+    "documentation": "https://github.com/erezdaniel7/pango_parking_integration",
+    "issue_tracker": "https://github.com/erezdaniel7/pango_parking_integration/issues",
     "iot_class": "cloud_polling",
     "requirements": [],
     "loggers": [

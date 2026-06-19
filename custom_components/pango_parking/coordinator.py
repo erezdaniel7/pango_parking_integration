@@ -10,6 +10,7 @@ from aiohttp import ClientSession
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -25,7 +26,6 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     config_entry: ConfigEntry
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
-        self.config_entry = entry
         self._session: ClientSession = async_get_clientsession(hass)
         self._client = PangoApiClient(
             self._session,
@@ -43,6 +43,7 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=entry,
             name=DOMAIN,
             update_interval=update_interval,
         )
@@ -55,7 +56,12 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             try:
                 await self._client.async_login()
                 return await self._client.async_fetch_parking_status()
+            except PangoAuthError as second_err:
+                raise ConfigEntryAuthFailed(
+                    f"Invalid credentials: {second_err}"
+                ) from second_err
             except PangoApiError as second_err:
-                raise UpdateFailed(f"Authentication failed: {second_err}") from second_err
+                raise UpdateFailed(f"API error after re-login: {second_err}") from second_err
         except PangoApiError as err:
             raise UpdateFailed(str(err)) from err
+

@@ -32,10 +32,12 @@
         }
     },
     "entity": {
-        "sensor": {
+        "binary_sensor": {
             "is_parking_active": {
                 "name": "Is parking active"
-            },
+            }
+        },
+        "sensor": {
             "parking_start_time": {
                 "name": "Parking start time"
             },

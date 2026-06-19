@@ -36,17 +36,15 @@ This repository includes a Home Assistant automation blueprint for notifications
 - Parking ends
 - Parking is still active each hour (top of hour)
 
-Blueprint file:
+> **Note:** HACS does not install blueprints automatically. Use the button below to import it in one click.
 
-- blueprints/automation/pango_parking/parking_notifications.yaml
+[![Import Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ferezdaniel7%2Fpango_parking_integration%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fpango_parking%2Fparking_notifications.yaml)
 
-Direct import URL:
-
-- https://raw.githubusercontent.com/erezdaniel7/pango_parking_integration/main/blueprints/automation/pango_parking/parking_notifications.yaml
+Or import manually: Settings → Automations → Blueprints → Import Blueprint → paste the URL above.
 
 After importing, select:
 
-- Is parking active sensor
+- Is parking active binary sensor
 - Parking start time sensor
 - Parking end time sensor
 - Action for parking started
@@ -108,9 +106,9 @@ To make Home Assistant/HACS show release versions (for example `0.3.0`) instead 
 
 1. Bump `version` in `custom_components/pango_parking/manifest.json`.
 2. Create a matching Git tag, for example `v0.3.0`.
-3. Publish a GitHub Release from that tag.
+3. Push the tag — the `release.yml` GitHub Action will automatically create a GitHub Release.
 
-This repository is configured with `zip_release: true` and `hide_default_branch: true` in `hacs.json` so HACS tracks releases rather than default-branch commits.
+HACS reads the latest GitHub Release to determine the available version.
 
 ## Troubleshooting
 

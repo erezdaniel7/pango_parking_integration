@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import voluptuous as vol
@@ -9,6 +10,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig
 
@@ -20,6 +22,8 @@ from .const import (
     MAX_POLL_INTERVAL_MINUTES,
     MIN_POLL_INTERVAL_MINUTES,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def _validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
@@ -35,17 +39,13 @@ async def _validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
 def _build_user_schema(user_input: dict[str, Any] | None = None) -> vol.Schema:
     """Build the config flow schema."""
     user_input = user_input or {}
-
     return vol.Schema(
         {
             vol.Required(CONF_USERNAME, default=user_input.get(CONF_USERNAME, "")): str,
             vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): str,
             vol.Optional(
                 CONF_POLL_INTERVAL_MINUTES,
-                default=user_input.get(
-                    CONF_POLL_INTERVAL_MINUTES,
-                    DEFAULT_POLL_INTERVAL_MINUTES,
-                ),
+                default=user_input.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES),
             ): NumberSelector(
                 NumberSelectorConfig(
                     min=MIN_POLL_INTERVAL_MINUTES,
@@ -64,10 +64,7 @@ def _build_options_schema(options: dict[str, Any]) -> vol.Schema:
         {
             vol.Required(
                 CONF_POLL_INTERVAL_MINUTES,
-                default=options.get(
-                    CONF_POLL_INTERVAL_MINUTES,
-                    DEFAULT_POLL_INTERVAL_MINUTES,
-                ),
+                default=options.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES),
             ): NumberSelector(
                 NumberSelectorConfig(
                     min=MIN_POLL_INTERVAL_MINUTES,
@@ -85,7 +82,7 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
@@ -101,6 +98,7 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except PangoApiError:
                 errors["base"] = "cannot_connect"
             except Exception:
+                _LOGGER.exception("Unexpected exception during Pango setup")
                 errors["base"] = "unknown"
             else:
                 data = {
@@ -109,10 +107,7 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
                 options = {
                     CONF_POLL_INTERVAL_MINUTES: int(
-                        user_input.get(
-                            CONF_POLL_INTERVAL_MINUTES,
-                            DEFAULT_POLL_INTERVAL_MINUTES,
-                        )
+                        user_input.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES)
                     )
                 }
                 return self.async_create_entry(
@@ -128,30 +123,23 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> PangoParkingOptionsFlow:
         """Get the options flow for this handler."""
-        return PangoParkingOptionsFlow(config_entry)
+        return PangoParkingOptionsFlow()
 
 
 class PangoParkingOptionsFlow(config_entries.OptionsFlow):
     """Options flow for Pango Parking."""
 
-    def __init__(self, config_entry):
-        self._config_entry = config_entry
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None):
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(
                 title="",
-                data={
-                    CONF_POLL_INTERVAL_MINUTES: int(
-                        user_input[CONF_POLL_INTERVAL_MINUTES]
-                    )
-                },
+                data={CONF_POLL_INTERVAL_MINUTES: int(user_input[CONF_POLL_INTERVAL_MINUTES])},
             )
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_build_options_schema(self._config_entry.options),
+            data_schema=_build_options_schema(self.config_entry.options),
         )
