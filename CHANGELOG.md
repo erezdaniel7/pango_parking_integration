@@ -2,7 +2,13 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
-## [0.4.2] - 2026-06-19
+## [0.4.3] - 2026-06-27
+
+### Fixed
+- **hassfest**: `manifest.json` keys now sorted correctly (`domain`, `name`, then alphabetical)
+- **HACS validation**: Removed invalid `domains` key from `hacs.json`
+- **HACS validation**: Added GitHub repo description and topics (`home-assistant`, `hacs`, `hacs-integration`, `custom-component`, `parking`, `pango`)
+
 
 ### Fixed
 - **Duplicate entity**: `sensor.is_parking_active` from v0.3.0 was left as a stale orphan after migration to `binary_sensor`. Added automatic cleanup in `async_setup_entry` to remove it on next HA restart.

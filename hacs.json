@@ -5,10 +5,5 @@
     "homeassistant": "2024.6.0",
     "country": [
         "IL"
-    ],
-    "domains": [
-        "sensor",
-        "binary_sensor",
-        "button"
     ]
 }
