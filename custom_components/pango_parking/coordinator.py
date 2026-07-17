@@ -50,18 +50,35 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
-            return await self._client.async_fetch_parking_status()
+            data = await self._client.async_fetch_parking_status()
+            self._last_good_data = data
+            return data
         except PangoAuthError as err:
             _LOGGER.debug("Pango auth failed, trying one re-login: %s", err)
             try:
                 await self._client.async_login()
-                return await self._client.async_fetch_parking_status()
+                data = await self._client.async_fetch_parking_status()
+                self._last_good_data = data
+                return data
             except PangoAuthError as second_err:
                 raise ConfigEntryAuthFailed(
                     f"Invalid credentials: {second_err}"
                 ) from second_err
             except PangoApiError as second_err:
-                raise UpdateFailed(f"API error after re-login: {second_err}") from second_err
+                return self._return_last_or_raise(
+                    f"API error after re-login: {second_err}", second_err
+                )
         except PangoApiError as err:
-            raise UpdateFailed(str(err)) from err
+            return self._return_last_or_raise(str(err), err)
+
+    def _return_last_or_raise(
+        self, message: str, cause: Exception
+    ) -> dict[str, Any]:
+        """Return last known good data on transient errors to avoid unavailable sensors."""
+        if hasattr(self, "_last_good_data") and self._last_good_data is not None:
+            _LOGGER.warning(
+                "Timeout fetching %s data, returning last known good data", DOMAIN
+            )
+            return self._last_good_data
+        raise UpdateFailed(message) from cause
 
