@@ -2,6 +2,11 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.4.4] - 2026-07-17
+
+### Fixed
+- **Sensor going Unavailable on timeout**: When the Pango API times out, the integration now returns the last known good data instead of marking all sensors as Unavailable. This prevents the "Is parking active" sensor from flickering to Unavailable during transient network issues.
+
 ## [0.4.3] - 2026-06-27
 
 ### Fixed
