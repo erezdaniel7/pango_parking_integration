@@ -43,6 +43,9 @@
             },
             "parking_end_time": {
                 "name": "זמן סיום חניה"
+            },
+            "telemetry_last_updated": {
+                "name": "עדכון אחרון"
             }
         },
         "button": {

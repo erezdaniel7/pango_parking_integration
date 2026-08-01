@@ -13,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .api import PangoApiClient, PangoApiError, PangoAuthError
 from .const import CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES, DOMAIN
@@ -52,6 +53,7 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         try:
             data = await self._client.async_fetch_parking_status()
             self._last_good_data = data
+            self.last_successful_update = dt_util.utcnow()
             return data
         except PangoAuthError as err:
             _LOGGER.debug("Pango auth failed, trying one re-login: %s", err)
@@ -59,6 +61,7 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 await self._client.async_login()
                 data = await self._client.async_fetch_parking_status()
                 self._last_good_data = data
+                self.last_successful_update = dt_util.utcnow()
                 return data
             except PangoAuthError as second_err:
                 raise ConfigEntryAuthFailed(

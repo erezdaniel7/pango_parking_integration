@@ -43,6 +43,9 @@
             },
             "parking_end_time": {
                 "name": "Parking end time"
+            },
+            "telemetry_last_updated": {
+                "name": "Telemetry last updated"
             }
         },
         "button": {
