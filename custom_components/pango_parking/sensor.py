@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import SENSOR_KEY_END, SENSOR_KEY_START
+from .const import SENSOR_KEY_END, SENSOR_KEY_LAST_UPDATED, SENSOR_KEY_START
 from .coordinator import PangoParkingDataUpdateCoordinator
 from .data import PangoConfigEntry
 from .entity import PangoBaseEntity
@@ -52,10 +52,12 @@ async def async_setup_entry(
 ) -> None:
     """Set up Pango Parking sensors from a config entry."""
     coordinator = entry.runtime_data.coordinator
-    async_add_entities(
+    entities: list[SensorEntity] = [
         PangoParkingSensor(coordinator, description)
         for description in SENSOR_DESCRIPTIONS
-    )
+    ]
+    entities.append(PangoLastUpdatedSensor(coordinator))
+    async_add_entities(entities)
 
 
 class PangoParkingSensor(PangoBaseEntity, SensorEntity):
@@ -93,4 +95,20 @@ class PangoParkingSensor(PangoBaseEntity, SensorEntity):
                 "target_date_raw": data.get("target_date_raw"),
             }
         return {}
+
+
+class PangoLastUpdatedSensor(PangoBaseEntity, SensorEntity):
+    """Sensor showing when the integration last successfully fetched data."""
+
+    _unique_id_suffix = SENSOR_KEY_LAST_UPDATED
+    _attr_translation_key = SENSOR_KEY_LAST_UPDATED
+    _attr_icon = "mdi:clock-check-outline"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, coordinator: PangoParkingDataUpdateCoordinator) -> None:
+        super().__init__(coordinator)
+
+    @property
+    def native_value(self) -> datetime | None:
+        return getattr(self.coordinator, "last_successful_update", None)
 

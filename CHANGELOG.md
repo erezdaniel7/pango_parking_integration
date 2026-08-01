@@ -2,6 +2,14 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.4.5] - 2026-08-01
+
+### Fixed
+- **Sensor still going Unavailable on timeout**: `asyncio.TimeoutError` was not caught as a `PangoApiError`, bypassing the last-known-data fallback. Now properly wrapped so timeouts never cause Unavailable state.
+
+### Added
+- **Telemetry last updated sensor**: New `sensor.car_*_telemetry_last_updated` showing the timestamp of the last successful data fetch from Pango.
+
 ## [0.4.4] - 2026-07-17
 
 ### Fixed
