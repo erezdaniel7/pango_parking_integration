@@ -31,6 +31,6 @@ class PangoPollNowButton(PangoBaseEntity, ButtonEntity):
         super().__init__(coordinator)
 
     async def async_press(self) -> None:
-        """Trigger an immediate coordinator refresh."""
-        await self.coordinator.async_request_refresh()
+        """Trigger an immediate coordinator refresh and wait for completion."""
+        await self.coordinator.async_refresh()
 
