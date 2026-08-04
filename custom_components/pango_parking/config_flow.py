@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -45,7 +44,9 @@ def _build_user_schema(user_input: dict[str, Any] | None = None) -> vol.Schema:
             vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): str,
             vol.Optional(
                 CONF_POLL_INTERVAL_MINUTES,
-                default=user_input.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES),
+                default=user_input.get(
+                    CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES
+                ),
             ): NumberSelector(
                 NumberSelectorConfig(
                     min=MIN_POLL_INTERVAL_MINUTES,
@@ -64,7 +65,9 @@ def _build_options_schema(options: dict[str, Any]) -> vol.Schema:
         {
             vol.Required(
                 CONF_POLL_INTERVAL_MINUTES,
-                default=options.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES),
+                default=options.get(
+                    CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES
+                ),
             ): NumberSelector(
                 NumberSelectorConfig(
                     min=MIN_POLL_INTERVAL_MINUTES,
@@ -82,7 +85,9 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
@@ -107,7 +112,9 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
                 options = {
                     CONF_POLL_INTERVAL_MINUTES: int(
-                        user_input.get(CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES)
+                        user_input.get(
+                            CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES
+                        )
                     )
                 }
                 return self.async_create_entry(
@@ -123,7 +130,9 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> PangoParkingOptionsFlow:
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> PangoParkingOptionsFlow:
         """Get the options flow for this handler."""
         return PangoParkingOptionsFlow()
 
@@ -131,12 +140,18 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class PangoParkingOptionsFlow(config_entries.OptionsFlow):
     """Options flow for Pango Parking."""
 
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(
                 title="",
-                data={CONF_POLL_INTERVAL_MINUTES: int(user_input[CONF_POLL_INTERVAL_MINUTES])},
+                data={
+                    CONF_POLL_INTERVAL_MINUTES: int(
+                        user_input[CONF_POLL_INTERVAL_MINUTES]
+                    )
+                },
             )
 
         return self.async_show_form(

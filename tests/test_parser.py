@@ -3,16 +3,15 @@
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
-
 _PARSER_PATH = (
-  Path(__file__).resolve().parents[1]
-  / "custom_components"
-  / "pango_parking"
-  / "parser.py"
+    Path(__file__).resolve().parents[1]
+    / "custom_components"
+    / "pango_parking"
+    / "parser.py"
 )
 _SPEC = spec_from_file_location("pango_parser", _PARSER_PATH)
 if _SPEC is None or _SPEC.loader is None:
-  raise RuntimeError("Could not load parser module for tests")
+    raise RuntimeError("Could not load parser module for tests")
 
 _MODULE = module_from_spec(_SPEC)
 _SPEC.loader.exec_module(_MODULE)

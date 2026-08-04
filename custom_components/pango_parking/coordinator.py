@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from typing import Any
 
 from aiohttp import ClientSession
@@ -74,9 +74,7 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except PangoApiError as err:
             return self._return_last_or_raise(str(err), err)
 
-    def _return_last_or_raise(
-        self, message: str, cause: Exception
-    ) -> dict[str, Any]:
+    def _return_last_or_raise(self, message: str, cause: Exception) -> dict[str, Any]:
         """Return last known good data on transient errors to avoid unavailable sensors."""
         if hasattr(self, "_last_good_data") and self._last_good_data is not None:
             _LOGGER.warning(
@@ -84,4 +82,3 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
             return self._last_good_data
         raise UpdateFailed(message) from cause
-
