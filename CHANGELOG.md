@@ -2,6 +2,11 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.4.6] - 2026-08-05
+
+### Fixed
+- **Poll Now button now awaits refresh**: `button.press` now waits for the data update to complete before returning. Automations no longer need a `delay` step after pressing Poll Now to get fresh sensor data.
+
 ## [0.4.5] - 2026-08-01
 
 ### Fixed
