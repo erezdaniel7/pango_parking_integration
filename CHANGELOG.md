@@ -21,18 +21,9 @@ All notable changes to the Pango Parking integration will be documented in this 
 - **hassfest**: `manifest.json` keys now sorted correctly (`domain`, `name`, then alphabetical)
 - **HACS validation**: Removed invalid `domains` key from `hacs.json`
 - **HACS validation**: Added GitHub repo description and topics (`home-assistant`, `hacs`, `hacs-integration`, `custom-component`, `parking`, `pango`)
-
-
-### Fixed
 - **Duplicate entity**: `sensor.is_parking_active` from v0.3.0 was left as a stale orphan after migration to `binary_sensor`. Added automatic cleanup in `async_setup_entry` to remove it on next HA restart.
-
-
-### Fixed
 - **HACS install error**: Removed `zip_release: true` from `hacs.json` — HACS was looking for a `.zip` asset in the release and failing with `NoneType` error because no zip was provided
 - **Logo not appearing in HA**: Re-saved `brand/icon.png` as proper RGBA PNG (was incorrectly saved as palette mode P after quantization)
-
-
-### Fixed
 - **HACS ecosystem compliance**: 7 blocking issues that caused hassfest/HACS validation to fail
 - **Logo now visible in HA**: Moved icon to `brand/` subdirectory (HA 2026.3+ requirement); compressed from 143 KB → 4.2 KB (256×256); added `icon@2x.png` (512×512) for Retina displays
 - **Auth re-prompt**: Coordinator now raises `ConfigEntryAuthFailed` on persistent login failure, triggering HA's built-in re-authentication UI instead of silently failing
@@ -50,10 +41,11 @@ All notable changes to the Pango Parking integration will be documented in this 
 ### Changed
 - Migrated from deprecated `hass.data[DOMAIN]` to `entry.runtime_data` pattern
 - `manifest.json`: Added `codeowners`, `documentation`, `issue_tracker`
-- `hacs.json`: Added `zip_release: true`, `hide_default_branch: true`, `homeassistant: 2024.6.0`
+- `hacs.json`: Added `hide_default_branch: true`, `homeassistant: 2024.6.0`
 - `config_flow.py`: Removed deprecated `OptionsFlow.__init__`; exceptions now logged; added return type annotations
 - `const.py`: Removed `SensorDeviceClass` import and `DATA_COORDINATOR` constant
 
+## [0.3.0]
 
 ### Added
 - **Automation Blueprint**: New blueprint for parking notifications with three trigger types:
@@ -62,22 +54,14 @@ All notable changes to the Pango Parking integration will be documented in this 
   - Hourly reminder while parking is still active
   - Blueprint supports custom actions for any notification service (mobile app, Telegram, etc.)
   - Template variables available: `parking_active`, `parking_start`, `parking_end`
-  - Blueprint URL: `https://raw.githubusercontent.com/erezdaniel7/pango_parking_integration/main/blueprints/automation/pango_parking/parking_notifications.yaml`
 
 - **Integration Logo**: Added custom parking icon badge for Home Assistant UI display
 
 - **Release Management**: Configured HACS to track GitHub releases instead of commit hashes
-  - Added `zip_release: true` to hacs.json
-  - Added `hide_default_branch: true` to hacs.json
-  - Home Assistant will now show semantic version numbers (e.g., 0.3.0) instead of commit IDs
 
 ### Changed
 - Updated manifest version to 0.3.0
 - Enhanced README with blueprint documentation and setup instructions
-
-### Documentation
-- Added section on how to use the parking notifications blueprint
-- Added instructions for GitHub releases to display proper version numbers in HA
 
 ## [0.2.1] - Previous release
 

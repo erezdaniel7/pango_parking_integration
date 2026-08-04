@@ -6,7 +6,7 @@
 
 Home Assistant custom integration for reading active parking status from Pango.
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Custom%20Integration-blue.svg)](https://www.home-assistant.io/)
 
 ## Overview
@@ -23,9 +23,10 @@ This integration logs in to Pango, reads parking status from the driver portal, 
 
 ### Entities
 
-- Sensor: Is parking active
+- Binary sensor: Is parking active
 - Sensor: Parking start time
 - Sensor: Parking end time
+- Sensor: Telemetry last updated
 - Button: Poll now
 
 ## Blueprint: Parking Notifications
@@ -38,7 +39,7 @@ This repository includes a Home Assistant automation blueprint for notifications
 
 > **Note:** HACS does not install blueprints automatically. Use the button below to import it in one click.
 
-[![Import Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ferezdaniel7%2Fpango_parking_integration%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fpango_parking%2Fparking_notifications.yaml)
+[![Import Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ferezdaniel7%2Fpango_parking_integration%2Fblob%2Fmaster%2Fblueprints%2Fautomation%2Fpango_parking%2Fparking_notifications.yaml)
 
 Or import manually: Settings → Automations → Blueprints → Import Blueprint → paste the URL above.
 
@@ -61,11 +62,9 @@ Tip: In action templates, you can use variables: `parking_active`, `parking_star
 
 1. Open HACS.
 2. Go to Integrations.
-3. Open the menu and select Custom repositories.
-4. Add https://github.com/erezdaniel7/pango_parking_integration.
-5. Set category to Integration.
-6. Install Pango Parking from HACS.
-7. Restart Home Assistant.
+3. Search for **Pango Parking**.
+4. Click **Download**.
+5. Restart Home Assistant.
 
 ### Option 2: Manual
 
