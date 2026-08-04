@@ -111,4 +111,3 @@ class PangoLastUpdatedSensor(PangoBaseEntity, SensorEntity):
     @property
     def native_value(self) -> datetime | None:
         return getattr(self.coordinator, "last_successful_update", None)
-

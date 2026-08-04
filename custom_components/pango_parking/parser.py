@@ -15,14 +15,12 @@ START_BUTTON_ID = 'id="ctl00_ContentPlaceHolder1_btnStartParking"'
 
 TARGET_DATE_RE = re.compile(r"TargetDate\s*=\s*['\"]([^'\"]+)['\"]", re.IGNORECASE)
 SPAN_BY_ID_RE_TEMPLATE = r'<span[^>]+id="{element_id}"[^>]*>(.*?)</span>'
-LABEL_ROW_RE_TEMPLATE = (
-    r"<td[^>]*>\s*{label}\s*</td>\s*<td[^>]*>(.*?)</td>"
-)
+LABEL_ROW_RE_TEMPLATE = r"<td[^>]*>\s*{label}\s*</td>\s*<td[^>]*>(.*?)</td>"
 TIME_RE = re.compile(r"^\d{2}:\d{2}:\d{2}$")
 CAR_ID_RE = re.compile(
     r'<select[^>]*id="ctl00_ContentPlaceHolder1_cboCars"[^>]*>.*?'
-    r'<option[^>]*selected[^>]*>([^<]+)</option>',
-    re.IGNORECASE | re.DOTALL
+    r"<option[^>]*selected[^>]*>([^<]+)</option>",
+    re.IGNORECASE | re.DOTALL,
 )
 
 
@@ -144,7 +142,9 @@ def _parse_time_with_reference_date(
     except ValueError:
         return None
 
-    date_source = reference.astimezone(tz).date() if reference else datetime.now(tz).date()
+    date_source = (
+        reference.astimezone(tz).date() if reference else datetime.now(tz).date()
+    )
     combined = datetime.combine(date_source, clock, tzinfo=tz)
 
     # Parking may span midnight, so if start appears after end reference, shift to previous day.

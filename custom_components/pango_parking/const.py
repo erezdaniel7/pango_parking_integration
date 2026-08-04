@@ -22,4 +22,3 @@ SENSOR_KEY_ACTIVE = "is_parking_active"
 SENSOR_KEY_START = "parking_start_time"
 SENSOR_KEY_END = "parking_end_time"
 SENSOR_KEY_LAST_UPDATED = "telemetry_last_updated"
-

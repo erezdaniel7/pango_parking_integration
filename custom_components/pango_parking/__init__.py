@@ -45,4 +45,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: PangoConfigEntry) -> bo
 async def _async_update_listener(hass: HomeAssistant, entry: PangoConfigEntry) -> None:
     """Handle options update by reloading the config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
-
