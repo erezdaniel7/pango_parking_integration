@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import html
 import logging
 import re
@@ -95,7 +94,7 @@ class PangoApiClient:
                 return text
         except ClientError as err:
             raise PangoApiError("Connection error while calling Pango") from err
-        except asyncio.TimeoutError as err:
+        except TimeoutError as err:
             raise PangoApiError("Timeout fetching pango_parking data") from err
 
     @staticmethod

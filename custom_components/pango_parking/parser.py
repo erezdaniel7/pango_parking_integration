@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone, tzinfo
 import html
 import re
+from datetime import UTC, datetime, timedelta, tzinfo
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -159,4 +159,4 @@ def _resolve_timezone(timezone_name: str) -> tzinfo:
     try:
         return ZoneInfo(timezone_name)
     except ZoneInfoNotFoundError:
-        return timezone.utc
+        return UTC

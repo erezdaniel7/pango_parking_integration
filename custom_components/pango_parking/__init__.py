@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
-from .const import DOMAIN, PLATFORMS, SENSOR_KEY_ACTIVE
+from .const import PLATFORMS, SENSOR_KEY_ACTIVE
 from .coordinator import PangoParkingDataUpdateCoordinator
 from .data import PangoConfigEntry, PangoRuntimeData
 
