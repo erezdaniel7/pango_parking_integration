@@ -53,10 +53,14 @@ async def async_setup_entry(
     """Set up Pango Parking sensors from a config entry."""
     coordinator = entry.runtime_data.coordinator
     entities: list[SensorEntity] = [
-        PangoParkingSensor(coordinator, description)
+        PangoParkingSensor(coordinator, car_id, description)
+        for car_id in (coordinator.data or {})
         for description in SENSOR_DESCRIPTIONS
     ]
-    entities.append(PangoLastUpdatedSensor(coordinator))
+    entities.extend(
+        PangoLastUpdatedSensor(coordinator, car_id)
+        for car_id in (coordinator.data or {})
+    )
     async_add_entities(entities)
 
 
@@ -68,25 +72,26 @@ class PangoParkingSensor(PangoBaseEntity, SensorEntity):
     def __init__(
         self,
         coordinator: PangoParkingDataUpdateCoordinator,
+        car_id: str,
         description: PangoSensorEntityDescription,
     ) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, car_id)
         self.entity_description = description
         self._unique_id_suffix = description.key
 
     @property
     def available(self) -> bool:
         """Return availability — requires both coordinator success and data present."""
-        return super().available and self.coordinator.data is not None
+        return super().available and self.car_data is not None
 
     @property
     def native_value(self) -> datetime | None:
-        data = self.coordinator.data or {}
+        data = self.car_data or {}
         return self.entity_description.value_fn(data)
 
     @property
     def extra_state_attributes(self) -> dict[str, str | None]:
-        data = self.coordinator.data or {}
+        data = self.car_data or {}
         if self.entity_description.key == SENSOR_KEY_START:
             return {"raw_time": data.get("start_time_raw")}
         if self.entity_description.key == SENSOR_KEY_END:
@@ -105,8 +110,10 @@ class PangoLastUpdatedSensor(PangoBaseEntity, SensorEntity):
     _attr_icon = "mdi:clock-check-outline"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
-    def __init__(self, coordinator: PangoParkingDataUpdateCoordinator) -> None:
-        super().__init__(coordinator)
+    def __init__(
+        self, coordinator: PangoParkingDataUpdateCoordinator, car_id: str
+    ) -> None:
+        super().__init__(coordinator, car_id)
 
     @property
     def native_value(self) -> datetime | None:

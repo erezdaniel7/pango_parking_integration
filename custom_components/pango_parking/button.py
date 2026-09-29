@@ -17,7 +17,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Pango Parking button from a config entry."""
-    async_add_entities([PangoPollNowButton(entry.runtime_data.coordinator)])
+    coordinator = entry.runtime_data.coordinator
+    async_add_entities(
+        PangoPollNowButton(coordinator, car_id) for car_id in (coordinator.data or {})
+    )
 
 
 class PangoPollNowButton(PangoBaseEntity, ButtonEntity):
@@ -27,8 +30,10 @@ class PangoPollNowButton(PangoBaseEntity, ButtonEntity):
     _attr_translation_key = "poll_now"
     _attr_icon = "mdi:refresh"
 
-    def __init__(self, coordinator: PangoParkingDataUpdateCoordinator) -> None:
-        super().__init__(coordinator)
+    def __init__(
+        self, coordinator: PangoParkingDataUpdateCoordinator, car_id: str
+    ) -> None:
+        super().__init__(coordinator, car_id)
 
     async def async_press(self) -> None:
         """Trigger an immediate coordinator refresh and wait for completion."""

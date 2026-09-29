@@ -5,7 +5,7 @@ from __future__ import annotations
 import html
 import re
 from datetime import UTC, datetime, timedelta, tzinfo
-from typing import Any
+from typing import Any, NamedTuple
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 ACTIVE_TABLE_ID = 'id="ctl00_ContentPlaceHolder1_tblExist"'
@@ -17,11 +17,22 @@ TARGET_DATE_RE = re.compile(r"TargetDate\s*=\s*['\"]([^'\"]+)['\"]", re.IGNORECA
 SPAN_BY_ID_RE_TEMPLATE = r'<span[^>]+id="{element_id}"[^>]*>(.*?)</span>'
 LABEL_ROW_RE_TEMPLATE = r"<td[^>]*>\s*{label}\s*</td>\s*<td[^>]*>(.*?)</td>"
 TIME_RE = re.compile(r"^\d{2}:\d{2}:\d{2}$")
-CAR_ID_RE = re.compile(
-    r'<select[^>]*id="ctl00_ContentPlaceHolder1_cboCars"[^>]*>.*?'
-    r"<option[^>]*selected[^>]*>([^<]+)</option>",
+CAR_SELECT_RE = re.compile(
+    r'<select[^>]*id="ctl00_ContentPlaceHolder1_cboCars"[^>]*>(.*?)</select>',
     re.IGNORECASE | re.DOTALL,
 )
+CAR_OPTION_RE = re.compile(
+    r"<option(?P<attributes>[^>]*)>(?P<label>.*?)</option>",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+class CarOption(NamedTuple):
+    """A car available in Pango's parking selector."""
+
+    car_id: str
+    value: str
+    selected: bool
 
 
 def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
@@ -54,12 +65,48 @@ def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
     }
 
 
+def parse_car_options(page_html: str) -> list[CarOption]:
+    """Extract all cars from the parking page selector."""
+    select_match = CAR_SELECT_RE.search(page_html)
+    if not select_match:
+        return []
+
+    options: list[CarOption] = []
+    for match in CAR_OPTION_RE.finditer(select_match.group(1)):
+        attributes = match.group("attributes")
+        raw_label = re.sub(r"<[^>]+>", "", match.group("label"))
+        car_id = html.unescape(raw_label).strip()
+        value_match = re.search(
+            r"""value\s*=\s*["']([^"']*)["']""",
+            attributes,
+            re.IGNORECASE,
+        )
+        value = html.unescape(value_match.group(1)).strip() if value_match else car_id
+        if not car_id or not value:
+            continue
+
+        options.append(
+            CarOption(
+                car_id=car_id,
+                value=value,
+                selected=bool(
+                    re.search(
+                        r"\bselected\b(?:\s*=\s*[^ >]+)?",
+                        attributes,
+                        re.IGNORECASE,
+                    )
+                ),
+            )
+        )
+    return options
+
+
 def _extract_car_id(page_html: str) -> str | None:
     """Extract selected car ID from combobox."""
-    match = CAR_ID_RE.search(page_html)
-    if not match:
-        return None
-    return match.group(1).strip() or None
+    return next(
+        (option.car_id for option in parse_car_options(page_html) if option.selected),
+        None,
+    )
 
 
 def _extract_target_date(page_html: str) -> str | None:

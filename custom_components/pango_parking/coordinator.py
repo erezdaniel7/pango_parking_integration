@@ -21,7 +21,9 @@ from .const import CONF_POLL_INTERVAL_MINUTES, DEFAULT_POLL_INTERVAL_MINUTES, DO
 _LOGGER = logging.getLogger(__name__)
 
 
-class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
+class PangoParkingDataUpdateCoordinator(
+    DataUpdateCoordinator[dict[str, dict[str, Any]]]
+):
     """Coordinate Pango Parking data updates."""
 
     config_entry: ConfigEntry
@@ -49,9 +51,9 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             update_interval=update_interval,
         )
 
-    async def _async_update_data(self) -> dict[str, Any]:
+    async def _async_update_data(self) -> dict[str, dict[str, Any]]:
         try:
-            data = await self._client.async_fetch_parking_status()
+            data = await self._client.async_fetch_parking_statuses()
             self._last_good_data = data
             self.last_successful_update = dt_util.utcnow()
             return data
@@ -59,7 +61,7 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Pango auth failed, trying one re-login: %s", err)
             try:
                 await self._client.async_login()
-                data = await self._client.async_fetch_parking_status()
+                data = await self._client.async_fetch_parking_statuses()
                 self._last_good_data = data
                 self.last_successful_update = dt_util.utcnow()
                 return data
@@ -74,7 +76,9 @@ class PangoParkingDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except PangoApiError as err:
             return self._return_last_or_raise(str(err), err)
 
-    def _return_last_or_raise(self, message: str, cause: Exception) -> dict[str, Any]:
+    def _return_last_or_raise(
+        self, message: str, cause: Exception
+    ) -> dict[str, dict[str, Any]]:
         """Return last known good data on transient errors to avoid unavailable sensors."""
         if hasattr(self, "_last_good_data") and self._last_good_data is not None:
             _LOGGER.warning(
