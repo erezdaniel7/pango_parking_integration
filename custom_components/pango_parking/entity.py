@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -15,22 +17,30 @@ class PangoBaseEntity(CoordinatorEntity[PangoParkingDataUpdateCoordinator]):
     _attr_has_entity_name = True
     _unique_id_suffix: str
 
-    @property
-    def unique_id(self) -> str:
-        """Return unique ID incorporating the car ID when available."""
-        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
-        entry_id = self.coordinator.config_entry.entry_id
-        prefix = f"{entry_id}_{car_id}" if car_id else entry_id
-        return f"{prefix}_{self._unique_id_suffix}"
+    def __init__(
+        self, coordinator: PangoParkingDataUpdateCoordinator, car_id: str
+    ) -> None:
+        super().__init__(coordinator)
+        self._car_id = car_id
 
     @property
-    def device_info(self) -> DeviceInfo | None:
-        """Return device info grouped by car ID."""
-        car_id = self.coordinator.data.get("car_id") if self.coordinator.data else None
-        if not car_id:
+    def car_data(self) -> dict[str, Any] | None:
+        """Return coordinator data for this entity's car."""
+        if self.coordinator.data is None:
             return None
+        return self.coordinator.data.get(self._car_id)
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique ID incorporating the car ID."""
+        entry_id = self.coordinator.config_entry.entry_id
+        return f"{entry_id}_{self._car_id}_{self._unique_id_suffix}"
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device info grouped by car ID."""
         return DeviceInfo(
-            identifiers={(DOMAIN, car_id)},
-            name=f"Car {car_id}",
+            identifiers={(DOMAIN, self._car_id)},
+            name=f"Car {self._car_id}",
             manufacturer="Pango",
         )

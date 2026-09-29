@@ -16,6 +16,7 @@ A [Home Assistant](https://www.home-assistant.io/) integration that monitors you
 - ⏱️ Parking start and end times
 - 🔄 Configurable polling interval (default: 10 minutes)
 - 🔑 Automatic session management and re-login
+- 🚙 Separate devices and sensors for every car on the account
 - 📢 Automation blueprint for parking notifications
 - 🔘 Manual refresh button
 
@@ -82,7 +83,6 @@ Template variables available in actions: `parking_active`, `parking_start`, `par
 ## Limitations
 
 - **Read-only** — starting/stopping parking is not supported (Pango requires CAPTCHA).
-- Single car per account (multi-car support planned — [#5](https://github.com/erezdaniel7/pango_parking_integration/issues/5)).
 
 ## Disclaimer
 

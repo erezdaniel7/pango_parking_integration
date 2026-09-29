@@ -16,6 +16,7 @@ if _SPEC is None or _SPEC.loader is None:
 _MODULE = module_from_spec(_SPEC)
 _SPEC.loader.exec_module(_MODULE)
 parse_parking_page = _MODULE.parse_parking_page
+parse_car_options = _MODULE.parse_car_options
 
 
 ACTIVE_HTML = """
@@ -80,9 +81,9 @@ INACTIVE_LIVE_SHAPE_HTML = """
 
 CAR_ID_HTML = """
 <select name="ctl00$ContentPlaceHolder1$cboCars" onchange="javascript:setTimeout('__doPostBack(\\'ctl00$ContentPlaceHolder1$cboCars\\',\\'\\')', 0)" id="ctl00_ContentPlaceHolder1_cboCars">
-<option>000-00-000</option>
-<option selected="selected">485-03-704</option>
-<option>999-99-999</option>
+<option>TEST-CAR-A</option>
+<option selected="selected">TEST-CAR-B</option>
+<option value="car-c">TEST-CAR-C</option>
 </select>
 """
 
@@ -133,4 +134,15 @@ def test_extract_car_id() -> None:
     """Car ID should be extracted from combobox."""
     result = parse_parking_page(CAR_ID_HTML, "Asia/Jerusalem")
 
-    assert result["car_id"] == "485-03-704"
+    assert result["car_id"] == "TEST-CAR-B"
+
+
+def test_parse_car_options() -> None:
+    """All car IDs, selector values, and selection state should be extracted."""
+    result = parse_car_options(CAR_ID_HTML)
+
+    assert [(car.car_id, car.value, car.selected) for car in result] == [
+        ("TEST-CAR-A", "TEST-CAR-A", False),
+        ("TEST-CAR-B", "TEST-CAR-B", True),
+        ("TEST-CAR-C", "car-c", False),
+    ]

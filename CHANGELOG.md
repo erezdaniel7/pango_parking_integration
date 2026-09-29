@@ -2,6 +2,14 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.5.0] - 2026-09-29
+
+### Added
+- **Multiple cars per account**: Discover every car registered in Pango and create a separate Home Assistant device with parking status, start time, end time, telemetry update, and manual poll entities for each car.
+
+### Changed
+- Polling now follows Pango's car-selector postback flow to fetch each vehicle's parking status while preserving existing single-car entity IDs.
+
 ## [0.4.6] - 2026-08-05
 
 ### Fixed
