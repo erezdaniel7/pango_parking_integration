@@ -10,6 +10,13 @@
                     "password": "Password",
                     "poll_interval_minutes": "Polling interval (minutes)"
                 }
+            },
+            "reauth_confirm": {
+                "title": "Reauthenticate Pango Parking",
+                "description": "Enter the password for {username}.",
+                "data": {
+                    "password": "Password"
+                }
             }
         },
         "error": {
@@ -18,7 +25,8 @@
             "unknown": "Unexpected error"
         },
         "abort": {
-            "already_configured": "Account is already configured"
+            "already_configured": "Account is already configured",
+            "reauth_successful": "Reauthentication was successful"
         }
     },
     "options": {
