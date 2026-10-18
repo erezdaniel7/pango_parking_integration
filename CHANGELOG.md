@@ -2,6 +2,12 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.5.1] - 2026-10-18
+
+### Fixed
+- Resolve and cache the Pango timezone asynchronously so parsing does not perform blocking file I/O on Home Assistant's event loop.
+- Add a reauthentication flow that validates a replacement password and reloads the config entry when credentials expire.
+
 ## [0.5.0] - 2026-09-29
 
 ### Added

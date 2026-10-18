@@ -80,6 +80,11 @@ def _build_options_schema(options: dict[str, Any]) -> vol.Schema:
     )
 
 
+def _build_reauth_schema() -> vol.Schema:
+    """Build the reauthentication schema."""
+    return vol.Schema({vol.Required(CONF_PASSWORD): str})
+
+
 class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Pango Parking."""
 
@@ -127,6 +132,46 @@ class PangoParkingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=_build_user_schema(user_input),
             errors=errors,
+        )
+
+    async def async_step_reauth(self, entry_data: dict[str, Any]) -> FlowResult:
+        """Handle reauthentication."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Validate updated credentials and reload the config entry."""
+        errors: dict[str, str] = {}
+        reauth_entry = self._get_reauth_entry()
+
+        if user_input is not None:
+            data = {
+                **reauth_entry.data,
+                CONF_PASSWORD: user_input[CONF_PASSWORD],
+            }
+            try:
+                await _validate_input(self.hass, data)
+            except PangoAuthError:
+                errors["base"] = "invalid_auth"
+            except PangoApiError:
+                errors["base"] = "cannot_connect"
+            except Exception:
+                _LOGGER.exception("Unexpected exception during Pango reauthentication")
+                errors["base"] = "unknown"
+            else:
+                return self.async_update_reload_and_abort(
+                    reauth_entry,
+                    data_updates=data,
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=_build_reauth_schema(),
+            errors=errors,
+            description_placeholders={
+                CONF_USERNAME: reauth_entry.data[CONF_USERNAME],
+            },
         )
 
     @staticmethod

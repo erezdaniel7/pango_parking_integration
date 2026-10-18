@@ -5,9 +5,11 @@ from __future__ import annotations
 import html
 import logging
 import re
+from datetime import UTC, tzinfo
 from typing import Any
 
 from aiohttp import ClientError, ClientSession, ClientTimeout
+from homeassistant.util import dt as dt_util
 
 from .const import LOGIN_URL, PARKING_URL, TIMEZONE
 from .parser import CarOption, parse_car_options, parse_parking_page
@@ -43,11 +45,12 @@ class PangoApiClient:
         self._password = password
         self._timeout = ClientTimeout(total=20)
         self._authenticated = False
+        self._timezone: tzinfo | None = None
 
     async def async_fetch_parking_status(self) -> dict[str, Any]:
         """Fetch the currently selected car status for compatibility."""
         page_html = await self._async_fetch_parking_page()
-        return parse_parking_page(page_html, TIMEZONE)
+        return parse_parking_page(page_html, await self._async_get_timezone())
 
     async def async_fetch_parking_statuses(self) -> dict[str, dict[str, Any]]:
         """Fetch and parse parking status for every car on the account."""
@@ -65,16 +68,23 @@ class PangoApiClient:
         if selected is None:
             raise PangoApiError("Pango parking page has no selected car")
 
-        statuses[selected.car_id] = parse_parking_page(page_html, TIMEZONE)
+        timezone = await self._async_get_timezone()
+        statuses[selected.car_id] = parse_parking_page(page_html, timezone)
         current_html = page_html
 
         for car in cars:
             if car == selected:
                 continue
             current_html = await self._select_car(current_html, car)
-            statuses[car.car_id] = parse_parking_page(current_html, TIMEZONE)
+            statuses[car.car_id] = parse_parking_page(current_html, timezone)
 
         return {car.car_id: statuses[car.car_id] for car in cars}
+
+    async def _async_get_timezone(self) -> tzinfo:
+        """Resolve and cache the integration timezone outside the parser."""
+        if self._timezone is None:
+            self._timezone = await dt_util.async_get_time_zone(TIMEZONE) or UTC
+        return self._timezone
 
     async def _async_fetch_parking_page(self) -> str:
         """Fetch the parking page with an authenticated session."""

@@ -10,6 +10,13 @@
                     "password": "סיסמה",
                     "poll_interval_minutes": "מרווח רענון (בדקות)"
                 }
+            },
+            "reauth_confirm": {
+                "title": "אימות מחדש של חניית Pango",
+                "description": "הזן את הסיסמה עבור {username}.",
+                "data": {
+                    "password": "סיסמה"
+                }
             }
         },
         "error": {
@@ -18,7 +25,8 @@
             "unknown": "שגיאה לא צפויה"
         },
         "abort": {
-            "already_configured": "החשבון כבר מוגדר"
+            "already_configured": "החשבון כבר מוגדר",
+            "reauth_successful": "האימות מחדש הצליח"
         }
     },
     "options": {

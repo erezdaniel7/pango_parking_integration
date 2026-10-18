@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import html
 import re
-from datetime import UTC, datetime, timedelta, tzinfo
+from datetime import datetime, timedelta, tzinfo
 from typing import Any, NamedTuple
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 ACTIVE_TABLE_ID = 'id="ctl00_ContentPlaceHolder1_tblExist"'
 INACTIVE_ROW_ID = 'id="ctl00_ContentPlaceHolder1_trNewParkingTitle"'
@@ -35,7 +34,7 @@ class CarOption(NamedTuple):
     selected: bool
 
 
-def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
+def parse_parking_page(page_html: str, timezone: tzinfo) -> dict[str, Any]:
     """Parse parking status from Pango ParkACar page HTML."""
     is_active = ACTIVE_TABLE_ID in page_html or STOP_BUTTON_ID in page_html
     is_inactive = INACTIVE_ROW_ID in page_html or START_BUTTON_ID in page_html
@@ -45,10 +44,9 @@ def parse_parking_page(page_html: str, timezone_name: str) -> dict[str, Any]:
     target_raw = _extract_target_date(page_html)
     car_id = _extract_car_id(page_html)
 
-    tz = _resolve_timezone(timezone_name)
-    target_dt = _parse_target_datetime(target_raw, tz)
-    start_dt = _parse_time_with_reference_date(start_raw, target_dt, tz)
-    end_dt = _parse_time_with_reference_date(end_raw, target_dt, tz)
+    target_dt = _parse_target_datetime(target_raw, timezone)
+    start_dt = _parse_time_with_reference_date(start_raw, target_dt, timezone)
+    end_dt = _parse_time_with_reference_date(end_raw, target_dt, timezone)
 
     if target_dt is not None and end_dt is None:
         end_dt = target_dt
@@ -199,11 +197,3 @@ def _parse_time_with_reference_date(
         combined = combined - timedelta(days=1)
 
     return combined
-
-
-def _resolve_timezone(timezone_name: str) -> tzinfo:
-    """Resolve timezone and gracefully fallback if tzdata is unavailable."""
-    try:
-        return ZoneInfo(timezone_name)
-    except ZoneInfoNotFoundError:
-        return UTC

@@ -1,5 +1,6 @@
 """Parser tests for Pango parking integration."""
 
+from datetime import timedelta, timezone
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
@@ -17,6 +18,8 @@ _MODULE = module_from_spec(_SPEC)
 _SPEC.loader.exec_module(_MODULE)
 parse_parking_page = _MODULE.parse_parking_page
 parse_car_options = _MODULE.parse_car_options
+
+TEST_TIMEZONE = timezone(timedelta(hours=3))
 
 
 ACTIVE_HTML = """
@@ -90,7 +93,7 @@ CAR_ID_HTML = """
 
 def test_parse_active_parking() -> None:
     """Active parking page should set active with parsed times."""
-    result = parse_parking_page(ACTIVE_HTML, "Asia/Jerusalem")
+    result = parse_parking_page(ACTIVE_HTML, TEST_TIMEZONE)
 
     assert result["is_active"] is True
     assert result["start_time_raw"] == "09:47:07"
@@ -98,11 +101,13 @@ def test_parse_active_parking() -> None:
     assert result["target_date_raw"] == "05/15/2026 12:47:07"
     assert result["start_time"] is not None
     assert result["end_time"] is not None
+    assert result["start_time"].tzinfo is TEST_TIMEZONE
+    assert result["end_time"].tzinfo is TEST_TIMEZONE
 
 
 def test_parse_inactive_parking() -> None:
     """Inactive parking page should set inactive markers."""
-    result = parse_parking_page(INACTIVE_HTML, "Asia/Jerusalem")
+    result = parse_parking_page(INACTIVE_HTML, TEST_TIMEZONE)
 
     assert result["is_active"] is False
     assert result["is_inactive"] is True
@@ -112,7 +117,7 @@ def test_parse_inactive_parking() -> None:
 
 def test_parse_active_with_label_fallback() -> None:
     """Active parking should parse even when span ids are missing."""
-    result = parse_parking_page(ACTIVE_FALLBACK_HTML, "Asia/Jerusalem")
+    result = parse_parking_page(ACTIVE_FALLBACK_HTML, TEST_TIMEZONE)
 
     assert result["is_active"] is True
     assert result["start_time_raw"] == "08:10:11"
@@ -122,7 +127,7 @@ def test_parse_active_with_label_fallback() -> None:
 
 def test_parse_inactive_live_shape() -> None:
     """Inactive page shape from live site should parse as inactive."""
-    result = parse_parking_page(INACTIVE_LIVE_SHAPE_HTML, "Asia/Jerusalem")
+    result = parse_parking_page(INACTIVE_LIVE_SHAPE_HTML, TEST_TIMEZONE)
 
     assert result["is_active"] is False
     assert result["is_inactive"] is True
@@ -132,7 +137,7 @@ def test_parse_inactive_live_shape() -> None:
 
 def test_extract_car_id() -> None:
     """Car ID should be extracted from combobox."""
-    result = parse_parking_page(CAR_ID_HTML, "Asia/Jerusalem")
+    result = parse_parking_page(CAR_ID_HTML, TEST_TIMEZONE)
 
     assert result["car_id"] == "TEST-CAR-B"
 
