@@ -2,6 +2,12 @@
 
 All notable changes to the Pango Parking integration will be documented in this file.
 
+## [0.5.2] - 2026-10-18
+
+### Changed
+- Raise the minimum supported Home Assistant version to 2024.11.0, which introduced the config flow reauthentication helpers used by the integration.
+- Point README release links directly to the latest published release.
+
 ## [0.5.1] - 2026-10-18
 
 ### Fixed
