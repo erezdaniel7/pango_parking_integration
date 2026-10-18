@@ -5,8 +5,8 @@
 </p>
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-31A9F4.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/erezdaniel7/pango_parking_integration.svg?style=for-the-badge&color=blue)](https://github.com/erezdaniel7/pango_parking_integration/releases)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.6+-blue.svg?style=for-the-badge)](https://www.home-assistant.io/)
+[![GitHub Release](https://img.shields.io/github/release/erezdaniel7/pango_parking_integration.svg?style=for-the-badge&color=blue)](https://github.com/erezdaniel7/pango_parking_integration/releases/latest)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.11+-blue.svg?style=for-the-badge)](https://www.home-assistant.io/)
 
 A [Home Assistant](https://www.home-assistant.io/) integration that monitors your active parking sessions from [Pango](https://www.pango.co.il/) (Israel).
 
@@ -42,7 +42,7 @@ A [Home Assistant](https://www.home-assistant.io/) integration that monitors you
 
 ### Manual
 
-1. Download `pango_parking.zip` from the [latest release](https://github.com/erezdaniel7/pango_parking_integration/releases).
+1. Download `pango_parking.zip` from the [latest release](https://github.com/erezdaniel7/pango_parking_integration/releases/latest).
 2. Extract and copy `pango_parking/` to your `custom_components/` directory.
 3. Restart Home Assistant.
 
